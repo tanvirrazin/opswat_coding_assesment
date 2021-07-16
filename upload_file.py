@@ -149,7 +149,7 @@ if __name__ == "__main__":
 		if not check_hash_lookup(readable_hash):
 			print("Uploading file now ...")
 
-			# Previous esult was not found
+			# Previous result was not found
 			# So uploading file now
 			data_id = upload_file_to_scan(file, file_name)
 
