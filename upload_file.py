@@ -2,23 +2,24 @@ import sys
 import requests, hashlib, json, time
 
 
-# put own APIKEY here
-APIKEY = '00a56de6dfe708484fa7d61bbbb891f4'
+# Place own APIKEY here
+APIKEY = ''
 
 
-# This function displays the information from the response body
 def display_scan_result(scan_report_body):
-
+	"""
+	This function displays the information from the response body
+	"""
 	print()
 	print("filename: {}".format(scan_report_body['file_info']['display_name']))
 						
-	# Detec
+	# Detecting if the scan got any threat from all the scanning engines
 	if scan_report_body['scan_results']['scan_all_result_a'] == 'No Threat Detected':
 		print("overall_status: Clean")
 	else:
 		print("overall_status: {}".format(scan_report_body['scan_results']['scan_all_result_a']))
 	
-
+	# Displaying individual scan result from each engine
 	for k in scan_report_body['scan_results']['scan_details']:
 		print("engine: {}".format(k))
 		print("threat_found: {}".format(scan_report_body['scan_results']['scan_details'][k]['threat_found'] or 'Clean'))
@@ -105,7 +106,7 @@ else:
 				if scan_report_req.status_code == 200:
 
 					if scan_report_body['scan_results']['scan_all_result_a'] != 'In Progress':
-
+						# Scan completed, result retrieved
 						display_scan_result(scan_report_body)
 						break
 
