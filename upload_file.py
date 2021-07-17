@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import requests, hashlib, json, time
 
 
@@ -49,13 +49,13 @@ def check_hash_lookup(readable_hash):
 		# So no need to upload anymore
 		print("Previous scan result found ...")
 		display_scan_result(scan_report_body)
-		return True
+		return (True, hash_check_req.status_code)
 
 	else:
 		# This file was not scanned previously
 		# So we have to upload the file now
 		print(scan_report_body['error']['messages'][0])
-		return False
+		return (False, hash_check_req.status_code)
 
 
 def upload_file_to_scan(file, file_name):
@@ -137,25 +137,36 @@ if __name__ == "__main__":
 		# Filename taken from command-line argument
 		file_name = sys.argv[1]
 
-		# File read and sha1 hash is calculated
-		file = open(file_name, 'rb')
-		bytes = file.read()
-		readable_hash = hashlib.sha1(bytes).hexdigest()
-		print("File sha1 hash: {}".format(readable_hash))
+		if not os.path.isfile(file_name):
+			# Given path is not a file
+			print("'{}' is not a file".format(file_name))
+		
+		else:
+			# File read and sha1 hash is calculated
+			file = open(file_name, 'rb')
+			bytes = file.read()
+			readable_hash = hashlib.sha1(bytes).hexdigest()
+			print("File sha1 hash: {}".format(readable_hash))
 
-		print("Checking hash lookup ...")
+			print("Checking hash lookup ...")
 
-		# Checking with hash if scan result already available
-		if not check_hash_lookup(readable_hash):
-			print("Uploading file now ...")
+			# Checking with hash if scan result already available
+			status, status_code = check_hash_lookup(readable_hash)
 
-			# Previous result was not found
-			# So uploading file now
-			data_id = upload_file_to_scan(file, file_name)
+			if status != True and status_code == 404:
+				# Scan result for this hash-value was found
+				# We checked the status-code, because if the status-code is 401
+				# that means the APIKEY is invalid, then it makes no sense to 
+				# call file-upload file further.
+				print("Uploading file now ...")
 
-			if data_id is not None:
-				# File upload was successfule
-				# Now retrieving scan result
-				retrieve_file_scan_result(data_id)
+				# Previous result was not found
+				# So uploading file now
+				data_id = upload_file_to_scan(file, file_name)
+
+				if data_id is not None:
+					# File upload was successfule
+					# Now retrieving scan result
+					retrieve_file_scan_result(data_id)
 					
 
