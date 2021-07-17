@@ -10,12 +10,12 @@
 4. Run the script "upload_file.py" with a files relative address with command "python upload_file.py /path/to/file"
 
 ## Work procedure
- At the begining of the program I wrote 4 methods -
-	 - display_scan_result
-	 - check_hash_lookup
-	 - upload_file_to_scan
-	 - retrieve_file_scan_result
-	
+At the begining of the program I wrote 4 methods -
+ 1. display_scan_result
+ 2. check_hash_lookup
+ 3. upload_file_to_scan
+ 4. retrieve_file_scan_result
+
 **display_scan_result**: This method takes care of how a scan result for a file should be formatted and displayed. It takes a scan-result in a python dictionary format as input. From outside the method, we are parsing the scan result part from a REST API response, converting it to a python dictionary  and passing it to this method. And the method displays it on the console itself.
 
 **check_hash_lookup**: This method is responsible for calling the REST API with a hash-value to check if the system already has a scan result saved against this hash-value. So it takes a hash-value in string format as input, calls "https://api.metadefender.com/v4/hash/:hash" API endpoint. If the request status-code is not 200, it means no scan result was found. It displays the error-message on the terminal and returns False. But if the status-code is 200, it means a scan-result was found for this hash-value. Then it calls "display_scan_result" method with the response body in a dictionary format and returns True.
